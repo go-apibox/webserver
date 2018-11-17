@@ -1,0 +1,103 @@
+# webserver config.yaml
+app:
+  host: 192.168.1.120
+  http_addr: :8899
+  tls:
+    enabled: false
+  mirror_hosts:
+  - 192.168.1.120|:8080
+  - test.com|:8899
+
+web:
+  debug: true
+  base_url: "/"
+  static_setting:
+    max_age: 0
+  statics:
+  - "/static/images/lo{go}/":
+      root: "."
+      mask_alias: "./static/oemlogo"
+  - "/favicon.ico":
+      root: "."
+      mask_alias: "./static/oemlogo"
+  - "/static/images/{noname:(?:.*\\.png)}":
+      root: "."
+      image_resize_enabled: true
+      image_resize_sizes:
+      - 60x60
+      - 30x30
+      - 16x16
+  - "/static/":
+      root: "."
+  - "/styles/":
+      root: "."
+  - "/scripts/":
+      root: "."
+      max_age: 10
+  page_setting:
+    base_dir: "views/"
+    global:
+      headers:
+        X-TEST: "test"
+      perm: public
+      unauthed_redirect: true
+      unauthed_redirect_method: "javascript"
+      session_auth_key: licenseapi.authed
+      login_url: /login?from={$FROM_URL$}
+    inject:
+      data:
+        version: "1.0"
+      include_data:
+        version: "static/version"
+      session:
+        session: licenseapi
+  pages:
+  - "/logout":
+      tmpl: "@logout"
+      data:
+        "@jump_to": /login
+        user_id: hilyjiang
+  - "/logintest":
+      tmpl: "@login"
+      data:
+        "@jump_to": /member
+        userid: hilyjiang
+  - "/login":
+      tmpl: login-main.html
+      headers:
+        Content-Type: "text/xhtml; charset=utf-8"
+      data:
+        "captcha_id": "@captcha:4"
+        name: wangal
+        staffs:
+          wangal: wang an li
+          jianglj: jiang lin jin
+  - "/captcha":
+      tmpl: "@captcha"
+  - "/member":
+      tmpl: member.html
+      perm: protected
+  - "/partials/{rest:.+}":
+      tmpl: "partials/{$rest$}"
+      perm: public
+      unauthed_redirect: false
+      excepts:
+        rest:
+        - "api/interface/side-menu.html"
+        - "api/interface/interface-gparams.html"
+  apis:
+  - "/api":
+      server: http://192.168.1.21:9999/
+      # addr: 192.168.122.120:8080
+      params:
+        api_debug: "1"
+      proxy_session:
+        enabled: false
+        session_map:
+          default: default
+        encrypt_key_action: APIBox.Session.GetKey
+      captcha_actions:
+        CCenter.Login:
+          identifier: Username
+          max_fail_count: 3
+

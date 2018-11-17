@@ -1,0 +1,9 @@
+<body>
+<img src="/captcha?id={$captcha_id$}"
+	style="cursor:pointer"
+	title="点击更换验证码"
+	onclick="this.src='/captcha?id={$captcha_id$}&reload='+Math.random()" />
+
+	{$ staffs|key:name $}
+	<p>version: {$ version $}</p>
+</body>
